@@ -1,0 +1,79 @@
+<div class="add_jump"></div>
+
+<script type="text/javascript" src="/static/js/jquery-1.12.4.min.js"></script>
+<script type="text/javascript">
+    var $add_x = $('#add_cart').offset().top;
+    var $add_y = $('#add_cart').offset().left;
+
+    var $to_x = $('#show_count').offset().top;
+    var $to_y = $('#show_count').offset().left;
+
+    $(".add_jump").css({'left':$add_y+80,'top':$add_x+10,'display':'block'});
+    $('#add_cart').click(function(){
+        //添加购物车 ajax   自定义属性attr      原有属性用prop
+        goodsId = $('.num_show').attr("goodsId");
+        num = $('.num_show').val();
+
+        param = {"goodsId":goodsId,"num":num};
+        $.post("/addCart",param,function (data) {
+            if(data.errno != 5){
+                alert(data.errmsg)
+            }
+        });
+
+        $(".add_jump").stop().animate({
+                'left': $to_y+7,
+                'top': $to_x+7},
+            "fast", function() {
+                $(".add_jump").fadeOut('fast',function(){
+                    $('#show_count').html(2);
+                });
+
+            });
+    });
+    CalTotalPrice();
+    $(".add").click(function () {
+        //让页面加号点击后面板显示数字加一
+        num = parseInt($(".num_show").val());
+        num += 1;
+        //重新赋值
+        $(".num_show").val(num);
+        CalTotalPrice()
+
+    });
+    $(".minus").click(function () {
+            //让页面加号点击后面板显示数字减一
+            num = parseInt($(".num_show").val());
+        if (num >1){
+            num -= 1;
+            //重新赋值
+            $(".num_show").val(num);
+            CalTotalPrice()
+    }
+    });
+    //计算总价 = 单价*数量
+    function CalTotalPrice() {
+        price = $(".show_pirze").children("em").text();
+        price = parseFloat(price);
+        //数量
+        count = $(".num_show").val();
+        count = parseInt(count);
+        //总价
+        totalPrice = price * count;
+
+        $(".total").children("em").text(totalPrice.toFixed(2))
+
+    }
+    $(".num_show").blur(function () {
+        num= $(this).val();
+        if (isNaN(num) || num.trim().length==0 || num<=0 ) {
+
+            num = 1;
+            $(this).val(num)
+        }
+
+        CalTotalPrice()
+
+    })
+
+</script>
